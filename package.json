@@ -13,6 +13,7 @@
   "dependencies": {
     "@google/genai": "^1.5.1",
     "@google/generative-ai": "^0.24.1",
+    "@mozilla/readability": "^0.6.0",
     "axios": "^1.10.0",
     "cheerio": "^1.1.0",
     "cors": "^2.8.5",

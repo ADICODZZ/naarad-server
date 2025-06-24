@@ -3,7 +3,8 @@ const cheerio = require("cheerio");
 const { OpenAI } = require("openai");
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 require("dotenv").config();
-
+const { JSDOM } = require('jsdom');
+const { Readability } = require('@mozilla/readability');
 //const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Load API key from environment variable
@@ -32,7 +33,7 @@ async function fetchArticleContent(url) {
   }
 }
 
-const { JSDOM } = require('jsdom');
+
 
 // async function extractWithJsdom(url) {
 //   const dom = await JSDOM.fromURL(url);
@@ -47,7 +48,7 @@ const { JSDOM } = require('jsdom');
 // }
 
 
-const { Readability } = require('@mozilla/readability');
+
 
 async function extractWithReadability(url) {
   const dom = await JSDOM.fromURL(url);
