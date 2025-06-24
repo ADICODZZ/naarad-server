@@ -59,7 +59,7 @@ exports.updatePreferences = async (req, res) => {
       const instructionTags=[...preferences.sports.instructionTags]
       console.log(instructionTags,"instructionTags");
 
-      const aiQuestions=[...preferences.sports.aiGeneratedAnswers];
+      const aiQuestions=[...preferences.sports.aiFollowUpQuestions];
 
       preferences.sports={
         subcategory,
