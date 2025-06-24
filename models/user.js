@@ -47,8 +47,8 @@ const UserSchema = new mongoose.Schema({
       instructionTags:[String], 
       
       aiGeneratedAnswers: [{
-        questions: String,
-        answers: String
+        question: String,
+        answer: String
       }],
       //specificInstructions: String
     },

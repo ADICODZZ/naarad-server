@@ -99,7 +99,8 @@ exports.updatePreferences = async (req, res) => {
         updateType,
         matchFormat,
         eventScope,
-        instructionTags
+        instructionTags,
+        aiGeneratedAnswers: aiQuestions
       }
       user.frequencyTiming.frequency=preferences.frequency;
       user.frequencyTiming.preferredTime=preferredTime;
