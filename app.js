@@ -18,7 +18,7 @@ app.use(express.json());
 // Middleware to enable CORS
 app.use(cors(
   {
-    origin: 'http://localhost:5174',
+    origin: 'https://naaradupdates.com',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE'
     //credentials: true,
   }
@@ -38,8 +38,8 @@ app.use(cors(
   // Schedule sports news jobs
   await scheduleSportsNewsJobs();
 
-  app.listen(3000, () => {
-    console.log('Server running on port 3000');
+  app.listen(process.env.PORT || 3000, () => {
+    console.log(`Server running on port ${process.env.PORT || 3000}`);
   });
 };
 startServer();
