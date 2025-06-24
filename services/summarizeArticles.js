@@ -34,17 +34,17 @@ async function fetchArticleContent(url) {
 
 const { JSDOM } = require('jsdom');
 
-async function extractWithJsdom(url) {
-  const dom = await JSDOM.fromURL(url);
-  const document = dom.window.document;
-  console.log(document,"document form dom");
+// async function extractWithJsdom(url) {
+//   const dom = await JSDOM.fromURL(url);
+//   const document = dom.window.document;
+//   console.log(document,"document form dom");
 
-  const title = document.querySelector('title')?.textContent;
-  const bodyText = document.body.textContent;
-  console.log(bodyText,"bodyText from dom");
+//   const title = document.querySelector('title')?.textContent;
+//   const bodyText = document.body.textContent;
+//   console.log(bodyText,"bodyText from dom");
 
-  return { title, bodyText: bodyText.trim().slice(0, 500) }; // first 500 chars
-}
+//   return { title, bodyText: bodyText.trim().slice(0, 500) }; // first 500 chars
+// }
 
 
 const { Readability } = require('@mozilla/readability');
