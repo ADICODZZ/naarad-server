@@ -59,6 +59,8 @@ exports.updatePreferences = async (req, res) => {
       const instructionTags=[...preferences.sports.instructionTags]
       console.log(instructionTags,"instructionTags");
 
+      const aiQuestions=[...preferences.sports.aiGeneratedAnswers];
+
       preferences.sports={
         subcategory,
         tags,
@@ -67,7 +69,8 @@ exports.updatePreferences = async (req, res) => {
         updateType,
         matchFormat,
         eventScope,
-        instructionTags
+        instructionTags,
+        aiGeneratedAnswers: aiQuestions
       }
 
       if(preferences.frequency=="Morning Digest"){

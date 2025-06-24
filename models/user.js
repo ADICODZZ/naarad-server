@@ -46,10 +46,10 @@ const UserSchema = new mongoose.Schema({
       eventScope:[String],
       instructionTags:[String], 
       
-      aiGeneratedAnswers: {
-        type: Map,
-        of: String // Dynamic rapid-fire answers
-      },
+      aiGeneratedAnswers: [{
+        questions: String,
+        answers: String
+      }],
       //specificInstructions: String
     },
     news: {
