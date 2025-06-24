@@ -27,32 +27,32 @@ exports.updatePreferences = async (req, res) => {
       const favPlayers=[];
       const followUpQuestions=preferences.sports.followUpAnswers
 
-      for(let i=0;i<followUpQuestions.favPlayer.selectedPredefinedTags.length;i++){
-        favPlayers[i]=followUpQuestions.favPlayer.selectedPredefinedTags[i];
+      for(let i=0;i<followUpQuestions.favPlayer?.selectedPredefinedTags?.length;i++){
+        favPlayers[i]=followUpQuestions.favPlayer?.selectedPredefinedTags[i];
       }
       console.log(favPlayers,"favPlayers");
 
       const favTeams=[];
-      for(let i=0;i<followUpQuestions.favTeam.selectedPredefinedTags.length;i++){
-        favTeams[i]=followUpQuestions.favTeam.selectedPredefinedTags[i];
+      for(let i=0;i<followUpQuestions.favTeam?.selectedPredefinedTags?.length;i++){
+        favTeams[i]=followUpQuestions.favTeam?.selectedPredefinedTags[i];
       }
       console.log(favTeams,"favTeams");
 
       const updateType=[];
-      for(let i=0;i<followUpQuestions.updateType.selectedPredefinedTags.length;i++){
-        updateType[i]=followUpQuestions.updateType.selectedPredefinedTags[i];
+      for(let i=0;i<followUpQuestions.updateType?.selectedPredefinedTags?.length;i++){
+        updateType[i]=followUpQuestions.updateType?.selectedPredefinedTags[i];
       }
       console.log(updateType,"updateType");
 
       const matchFormat=[];
-      for(let i=0;i<followUpQuestions.matchFormat.selectedPredefinedTags.length;i++){
-        matchFormat[i]=followUpQuestions.matchFormat.selectedPredefinedTags[i];
+      for(let i=0;i<followUpQuestions.matchFormat?.selectedPredefinedTags?.length;i++){
+        matchFormat[i]=followUpQuestions.matchFormat?.selectedPredefinedTags[i];
       }
       console.log(matchFormat,"matchFormat");
 
       const eventScope=[];
-      for(let i=0;i<followUpQuestions.eventScope.selectedPredefinedTags.length;i++){
-        eventScope[i]=followUpQuestions.eventScope.selectedPredefinedTags[i];
+      for(let i=0;i<followUpQuestions.eventScope?.selectedPredefinedTags?.length;i++){
+        eventScope[i]=followUpQuestions?.eventScope?.selectedPredefinedTags[i];
       }
       console.log(eventScope,"eventScope");
 
