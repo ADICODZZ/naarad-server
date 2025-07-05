@@ -38,7 +38,7 @@ app.use(cors(
   // Schedule sports news jobs
   await scheduleSportsNewsJobs();
 
-  app.listen(process.env.PORT || 3000, () => {
+  app.listen( 9000, () => {
     console.log(`Server running on port ${process.env.PORT || 3000}`);
   });
 };
