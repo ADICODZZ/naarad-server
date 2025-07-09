@@ -24,7 +24,7 @@ app.use(cors(
   }
 ));
 
-  mongoose.connect(process.env.MONGODB_URI, {
+  mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://aditya09sinha264:kD5q7YdF324Y4PHQ@cluster0.9tfpwwe.mongodb.net/naarad-DB', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
