@@ -97,7 +97,7 @@ const startServer = async () => {
   app.put('/api/preferences/:userId', preferencesController.updatePreferences);
 
   // Schedule sports news jobs
-  await scheduleSportsNewsJobs();
+  //await scheduleSportsNewsJobs();
 
   // Start Express server
   app.listen(process.env.PORT || 3000, () => {
