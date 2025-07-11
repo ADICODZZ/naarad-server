@@ -85,7 +85,7 @@ const startBackgroundJob = async () => {
 };
 
 const startServer = async () => {
-  await mongoose.connect(process.env.MONGODB_URI, {
+  await mongoose.connect(process.env.MONGODB_URI|| 'mongodb+srv://aditya09sinha264:kD5q7YdF324Y4PHQ@cluster0.9tfpwwe.mongodb.net/naarad-DB', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -97,7 +97,7 @@ const startServer = async () => {
   app.put('/api/preferences/:userId', preferencesController.updatePreferences);
 
   // Schedule sports news jobs
-  await scheduleSportsNewsJobs();
+  //await scheduleSportsNewsJobs();
 
   // Start Express server
   app.listen(process.env.PORT || 3000, () => {

@@ -196,8 +196,9 @@ exports.updatePreferences = async (req, res) => {
     }
 
     if(preferences.customInterestTags.length!=0){
+      console.log(preferences.customInterestTags,"customInterestTags");
       const type=preferences.customInterestTags[0];
-      const specificInstructions=preferences.customInterestTags.slice(1);
+      const specificInstructions=preferences.customInterestTags[1];
       const userId = req.params.userId;
       const user = await User.findById(userId);
       if (!user) {
