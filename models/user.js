@@ -4,7 +4,7 @@ const NewsLogSchema = new mongoose.Schema({
   title: { type: String, required: true },
   url: String,
   date: { type: Date, default: Date.now },
-  reason:String
+  reason: String
 });
 
 const UserSchema = new mongoose.Schema({
@@ -21,8 +21,6 @@ const UserSchema = new mongoose.Schema({
 
   category: {
     type: [String],
-    //enum: ["sports", 'movies', "news", 'youtube', 'custom'],
-    //required: true
   },
 
   customInterestTags: [String],
@@ -41,59 +39,67 @@ const UserSchema = new mongoose.Schema({
       tags: [String],
       favPlayers: [String],
       favTeams: [String],
-      upateType:[String],
-      matchFormat:[String],
-      eventScope:[String],
-      instructionTags:[String], 
-      
+      upateType: [String],
+      matchFormat: [String],
+      eventScope: [String],
+      instructionTags: [String],
+
       aiGeneratedAnswers: [{
         question: String,
         answer: String
-      }],
-      //specificInstructions: String
+      }]
     },
+
     news: {
       tags: [String],
       newsSources: [String],
       newsdepth: [String],
-      newsFormatPreference:[String],
-      newsFrequency:[String],
-      //localNewsArea: String,
+      newsFormatPreference: [String],
+      newsFrequency: [String],
       instructionTags: [String],
       aiGeneratedAnswers: {
         questions: String,
         answers: String
       }
     },
+
     youtube: {
       favoriteChannels: [String],
       topicsOfInterest: [String],
       preferredVideoDuration: String,
       specificInstructions: String
     },
+
     movies: {
       specificInstructions: String
     },
-    custom: {
-      specificInstructions: String
-    }
+
+  custom: {
+  type: {
+    type: String, // Optional: if you actually want a `type` field inside custom
+    specificInstructions: [String],
+    lastUpdate: { type: Date },
+    previousMessages: [{
+      message: String,
+      sentAt: { type: Date, default: Date.now }
+    }]
+  },
+  default: {}
+}
+
   },
 
   frequencyTiming: {
     frequency: {
       type: String,
       enum: ['Real-time', 'Morning Digest', 'Evening Summary', 'Custom'],
-      //required: true
     },
     preferredTime: String,
-    //timezone: "IST",
     deliveryPlatform: {
       type: String,
       default: 'whatsapp'
     }
   },
-
-  // eg: "08:00 AM"
 
   newsHistory: [NewsLogSchema],
 

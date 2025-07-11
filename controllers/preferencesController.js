@@ -195,6 +195,23 @@ exports.updatePreferences = async (req, res) => {
 
     }
 
+    if(preferences.customInterestTags.length!=0){
+      const type=preferences.customInterestTags[0];
+      const specificInstructions=preferences.customInterestTags.slice(1);
+      const userId = req.params.userId;
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      user.preferences.custom.type = type;
+      user.preferences.custom.specificInstructions = specificInstructions;
+      user.preferences.custom.previousMessages = [];
+      user.preferences.custom.lastUpdate = null;
+
+      await user.save();
+      return res.status(200).json({ message: 'Preferences updated successfully', user });
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

@@ -33,6 +33,7 @@ Your goal is to generate a powerful search query for fetching news that’s high
 
     const result = await model.generateContent(prompt);
     console.log('Gemini response:', result);
+    
     const response = result?.response?.candidates?.[0]?.content?.parts?.[0]?.text;
     console.log('Gemini generated query:', response);
 

@@ -1,5 +1,5 @@
 const axios = require('axios');
-
+require('dotenv').config();
 async function fetchImageForArticle(title) {
   const params = {
      engine: 'google_images',
