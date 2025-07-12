@@ -40,7 +40,7 @@ async function customUpdate(user) {
   const custom = user.preferences?.custom || {};
   console.log(`🔍 User custom preferences:`, custom);
 
-  const type = custom.type || 'New Recipes Weekly';
+  const type = custom.category || 'New Recipes Weekly';
   const specificInstructions =
     Array.isArray(custom.specificInstructions) && custom.specificInstructions.length > 0
       ? custom.specificInstructions

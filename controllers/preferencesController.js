@@ -204,10 +204,10 @@ exports.updatePreferences = async (req, res) => {
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-      user.preferences.custom.type.type = type;
+      user.preferences.custom.category = type;
       user.preferences.custom.specificInstructions = specificInstructions;
       user.preferences.custom.previousMessages = [];
-      user.preferences.custom.type.lastUpdate = Date.now();
+      user.preferences.custom.lastUpdate = Date.now();
 
       await user.save();
       return res.status(200).json({ message: 'Preferences updated successfully', user });
