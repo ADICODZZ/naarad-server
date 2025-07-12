@@ -84,7 +84,7 @@ const UserSchema = new mongoose.Schema({
       sentAt: { type: Date, default: Date.now }
     }]
   },
-  default: {}
+  //default: {}
 }
 
   },
