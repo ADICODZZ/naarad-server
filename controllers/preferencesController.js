@@ -207,7 +207,7 @@ exports.updatePreferences = async (req, res) => {
       user.preferences.custom.type = type;
       user.preferences.custom.specificInstructions = specificInstructions;
       user.preferences.custom.previousMessages = [];
-      user.preferences.custom.lastUpdate = null;
+      user.preferences.custom.lastUpdate = Date.now();
 
       await user.save();
       return res.status(200).json({ message: 'Preferences updated successfully', user });

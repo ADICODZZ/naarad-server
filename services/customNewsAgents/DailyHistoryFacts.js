@@ -24,7 +24,7 @@ Task:
 - Use clean formatting and line breaks for readability
 
 ✅ Check:  
-You are also passed a list of "${previousMesages}":  
+You are also passed a list of "${previousMessages}":  
 ${JSON.stringify(previousMessages)}  
 Do NOT generate a fact or message that matches or closely resembles any of the previous messages. Make sure today’s message is unique.
 

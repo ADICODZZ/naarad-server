@@ -48,8 +48,8 @@ const runActionsForUser = async (userId) => {
   console.log(`🔍 Found custom preferences for user: ${userId}`);
 
   // Run custom update
-  //const response = await customUpdate(user);
-  //console.log(`✅ Custom update response for user ${userId}:`, response);
+  const response = await customUpdate(user);
+  console.log(`✅ Custom update response for user ${userId}:`, response);
 };
 
 
