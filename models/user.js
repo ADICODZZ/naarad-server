@@ -75,15 +75,15 @@ const UserSchema = new mongoose.Schema({
     },
 
   custom: {
-  type: {
-    type: String, // Optional: if you actually want a `type` field inside custom
+  
+    category: String, // Optional: if you actually want a `type` field inside custom
     specificInstructions: [String],
     lastUpdate: { type: Date },
     previousMessages: [{
       message: String,
       sentAt: { type: Date, default: Date.now }
     }]
-  },
+  ,
   //default: {}
 }
 
