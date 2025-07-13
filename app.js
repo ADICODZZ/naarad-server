@@ -1,5 +1,5 @@
 require('dotenv').config({ path: '../.env' });
-
+const {runDailySportsNewsJobForUser} = require('./controllers/newsController');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -39,17 +39,30 @@ const runActionsForUser = async (userId) => {
 
   // Check if custom preferences exist and have a type or instructions
   const custom = user.preferences?.custom;
+  const sports= user.preferences?.sports;
+  const news = user.preferences?.news;
 
-  if (!custom || (!custom.type && (!custom.specificInstructions || custom.specificInstructions.length === 0))) {
-    console.log(`❌ No valid custom preferences found for user: ${userId}`);
-   // await customUpdate(user);
+  if (custom && (custom.category )) {
+    console.log(` valid custom preferences found for user: ${userId}`);
+    await customUpdate(user);
   }
 
-  console.log(`🔍 Found custom preferences for user: ${userId}`);
+  if(sports&& sports.subcategory){
+    console.log(` valid sports preferences found for user: ${userId}`);
+    await runDailySportsNewsJobForUser(userId);
+  }
+
+  if(news && news.tags && news.instructionTags){
+    console.log(`valid news preferences found for user: ${userId}`);
+    //await runDailySportsNewsJobForUser(userId);
+  }
+
+
+  
 
   // Run custom update
-  const response = await customUpdate(user);
-  console.log(`✅ Custom update response for user ${userId}:`, response);
+  //const response = await customUpdate(user);
+  //console.log(`✅ Custom update response for user ${userId}:`, response);
 };
 
 

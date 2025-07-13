@@ -194,7 +194,7 @@ const rescheduleUserJob = async (userId) => {
 
 const moment = require('moment-timezone');
 
-const runDailySportsNewsJobForUser = async (user) => {
+exports.runDailySportsNewsJobForUser = async (user) => {
   try {
     const { preferences, whatsappNumber } = user;
     const { subcategory, tags, instructionTags, favPlayers,favTeams, aiGeneratedAnswers } = preferences.sports;
@@ -235,11 +235,33 @@ const runDailySportsNewsJobForUser = async (user) => {
     const response = await sendNewsUpdate('9142437079', bestArticle.title, summary, bestArticle.url, imageUrl);
     console.log(response, `Response from Twilio for ${whatsappNumber}`);
 
+    const emailResponse=await sendEmail(user.email, bestArticle.title, summary);
+    console.log(emailResponse, `Email sent to ${user.email}`);
+
     console.log(`✅ Sports news sent to ${whatsappNumber}.`);
   } catch (error) {
     console.error(`❌ Error in sports news job for ${user.whatsappNumber}:`, error.message);
   }
 };
+
+async function sendEmail( to_email, subject, message ) {
+  const mailOptions = {
+    from: `"Update Bot" <${process.env.GMAIL_USER}>`,
+    to: to_email,
+    subject,
+    text: message,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent!", info.response);
+    return { success: true, info };
+  } catch (error) {
+    console.error("❌ Failed to send email:", error);
+    return { success: false, error };
+  }
+}
+
 
 // Schedule jobs for all users
 const scheduleSportsNewsJobs = async () => {

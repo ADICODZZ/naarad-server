@@ -1,3 +1,4 @@
+const { duration } = require("moment-timezone");
 const mongoose = require("mongoose");
 
 const NewsLogSchema = new mongoose.Schema({
@@ -47,7 +48,11 @@ const UserSchema = new mongoose.Schema({
       aiGeneratedAnswers: [{
         question: String,
         answer: String
-      }]
+      }],
+      previousMessages: [{
+      message: String,
+      sentAt: { type: Date, default: Date.now }
+    }]
     },
 
     news: {
@@ -60,14 +65,25 @@ const UserSchema = new mongoose.Schema({
       aiGeneratedAnswers: {
         questions: String,
         answers: String
-      }
+      },
+      previousMessages: [{
+      message: String,
+      sentAt: { type: Date, default: Date.now }
+    }]
     },
 
     youtube: {
       favoriteChannels: [String],
+      videoStyle:[String],
+      duration:[String],
       topicsOfInterest: [String],
       preferredVideoDuration: String,
-      specificInstructions: String
+      specificInstructions: String,
+      lastUpdate: { type: Date },
+      previousMessages: [{
+      message: String,
+      sentAt: { type: Date, default: Date.now }
+    }]
     },
 
     movies: {
@@ -75,8 +91,7 @@ const UserSchema = new mongoose.Schema({
     },
 
   custom: {
-  
-    category: String, // Optional: if you actually want a `type` field inside custom
+    category:{type: String} , // Optional: if you actually want a `type` field inside custom
     specificInstructions: [String],
     lastUpdate: { type: Date },
     previousMessages: [{

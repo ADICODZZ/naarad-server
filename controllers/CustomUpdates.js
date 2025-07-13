@@ -2,7 +2,7 @@ const { generateRecipe } = require('../services/customNewsAgents/RecipeAgent');
 const { generateMotivationalQuote } = require('../services/customNewsAgents/MotivationalQuoteAgent');
 const { generateDailyHistoryFacts } = require('../services/customNewsAgents/DailyHistoryFacts');
 const { generateWordOfDay } = require('../services/customNewsAgents/WordOfDayAgent');
-
+const {generateStockMarketUpdate} = require('../services/customNewsAgents/StockMarketAgent');
 const nodemailer = require("nodemailer");
 const UserModel = require('../models/user'); // Adjust path if needed
 
@@ -93,16 +93,14 @@ async function customUpdate(user) {
         subject = 'History Fact of the Day';
         break;
 
-      case 'Word of The Day':
+      case 'Word of the Day (Language Learning)':
         content = await generateWordOfDay(specificInstructions, previousMessages);
-        subject = 'Word of the Day';
+        subject = 'Word of the Day (Language Learning)';
         break;
 
-      case 'Stock Market Movers':
-        console.warn(
-          '⚠️ Using RecipeAgent for Stock Market Movers — consider replacing with a dedicated agent.'
-        );
-        content = await generateRecipe(specificInstructions);
+      case 'Stock Market Movers (Specific Stocks)':
+       
+        content = await generateStockMarketUpdate(specificInstructions);
         subject = 'Your Weekly Stock Market Movers';
         break;
 

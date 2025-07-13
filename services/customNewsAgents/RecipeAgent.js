@@ -4,22 +4,18 @@ require('dotenv').config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 
-exports.generateRecipe = async ({ specificInstructions,previousMessages }) => {
+exports.generateRecipe = async ( specificInstructions,previousMessages ) => {
   try {
+    
     const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-
+    
+    console.log('🔍 Generating recipe with instructions:', specificInstructions);
    
-
     const prompt = `You are a professional chef and a creative writer.
-
-🎯 Task:
-- Generate **one unique recipe** based on these user instructions:  
-"${specificInstructions}"  
-(The instructions might specify cuisine, preferred ingredients, dietary restrictions, or a theme — respect them fully.)
-
-🎯 Style:
-- Output **only the recipe**, nothing else. Do not add introductions, explanations, or apologies.
-- WhatsApp-friendly: Short, clean, and engaging.
+    🎯 Task:- Generate **one unique recipe** based on these user instructions:"${specificInstructions}"  
+    (The instructions might specify cuisine, preferred ingredients, dietary restrictions, or a theme — respect them fully.)
+    🎯 Style:- Output **only the recipe**, nothing else. Do not add introductions, explanations, or apologies.
+    - WhatsApp-friendly: Short, clean, and engaging.
 - Starts with a catchy title or headline, styled with a relevant emoji.
 - Clearly lists **Ingredients** and then **Steps**, with proper indentation.
 - Use emojis where appropriate (but not excessive).
@@ -31,9 +27,7 @@ You are also passed a list of "${previousMessages}":
 ${JSON.stringify(previousMessages)}  
 Do NOT generate a recipe that matches or closely resembles any of the previous messages. Make sure today’s recipe is unique.
 
-✍️ Output only the recipe, in the requested style.
-
-`;
+✍️ Output only the recipe, in the requested style.`;
 
     const result = await model.generateContent(prompt);
     console.log('Gemini response:', result);
