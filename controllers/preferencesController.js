@@ -215,11 +215,11 @@ exports.updatePreferences = async (req, res) => {
 
     if(preferences.youtube.selectedTags.length!=0){
       console.log(preferences.customInterestTags,"customInterestTags");
-      const favoriteChannels=preferences.youtube.selectedTags;
-      const videoStyle =preferences.youtube.videoStyle.selectedPredefinedTags;
+      const favoriteChannels=[...preferences.youtube.selectedTags];
+      const videoStyle =[...preferences.youtube.videoStyle.selectedPredefinedTags];
       //const notificationType=preferences.youtube.notificationType.selectedPredefinedTags[0];
       //const specificInstructions=preferences.customInterestTags[1];
-      const duration=preferences.youtube.instructionTags[0];
+      const duration=[...preferences.youtube.instructionTags];
       const userId = req.params.userId;
       const user = await User.findById(userId);
       if (!user) {
