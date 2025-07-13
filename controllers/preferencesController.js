@@ -225,10 +225,10 @@ exports.updatePreferences = async (req, res) => {
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-      user.preferences.youtube.favoriteChannels = favoriteChannels ;
-      user.preferences.youtube.videoStyle=videoStyle;
-      user.preferences.youtube.specificInstructions = specificInstructions;
-      user.preferences.youtube.duration = duration;
+      user.preferences.youtube.favoriteChannels = [...favoriteChannels] ;
+      user.preferences.youtube.videoStyle=[...videoStyle];
+      user.preferences.youtube.specificInstructions = [...specificInstructions];
+      user.preferences.youtube.duration = [...duration];
       user.preferences.youtube.lastUpdate = Date.now();
 
       await user.save();
