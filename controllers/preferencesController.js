@@ -213,27 +213,35 @@ exports.updatePreferences = async (req, res) => {
       return res.status(200).json({ message: 'Preferences updated successfully', user });
     }
 
-    if(preferences.youtube.selectedTags.length!=0){
-      console.log(preferences.customInterestTags,"customInterestTags");
-      const favoriteChannels=[...preferences.youtube.selectedTags];
-      const videoStyle =[...preferences.youtube.videoStyle.selectedPredefinedTags];
-      //const notificationType=preferences.youtube.notificationType.selectedPredefinedTags[0];
-      //const specificInstructions=preferences.customInterestTags[1];
-      const duration=[...preferences.youtube.instructionTags];
-      const userId = req.params.userId;
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      user.preferences.youtube.favoriteChannels = [...favoriteChannels] ;
-      user.preferences.youtube.videoStyle=[...videoStyle];
-      user.preferences.youtube.specificInstructions = [...specificInstructions];
-      user.preferences.youtube.duration = [...duration];
-      user.preferences.youtube.lastUpdate = Date.now();
+    if (preferences.youtube.selectedTags.length !== 0) {
+  console.log(preferences.customInterestTags, "customInterestTags");
 
-      await user.save();
-      return res.status(200).json({ message: 'Preferences updated successfully', user });
-    }
+  const favoriteChannels = [...preferences.youtube.selectedTags];
+  const videoStyle = [...preferences.youtube.videoStyle.selectedPredefinedTags];
+  const specificInstructions = preferences.customInterestTags?.[1] || ''; // assume string
+  const duration = [...preferences.youtube.instructionTags];
+
+  const userId = req.params.userId;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  if (!user.preferences.youtube) {
+    user.preferences.youtube = {};
+  }
+
+  user.preferences.youtube.favoriteChannels = favoriteChannels;
+  user.preferences.youtube.videoStyle = videoStyle;
+  user.preferences.youtube.specificInstructions = specificInstructions;
+  user.preferences.youtube.duration = duration;
+  user.preferences.youtube.lastUpdate = Date.now();
+
+  await user.save();
+
+  return res.status(200).json({ message: 'Preferences updated successfully', user });
+}
+
 
 
 
