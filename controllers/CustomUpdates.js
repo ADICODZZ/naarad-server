@@ -69,6 +69,7 @@ async function customUpdate(user) {
 
   if (timeSinceLastUpdate < ONE_WEEK_MS) {
     console.log(`⏳ Too soon to send ${type} again for user ${user._id}. Skipping.`);
+    //
     return { skipped: true };
   }
 
