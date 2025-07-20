@@ -215,7 +215,7 @@ exports.updatePreferences = async (req, res) => {
     }
 
     if (preferences.youtube.selectedTags.length != 0) {
-      console.log(preferences.customInterestTags, "customInterestTags");
+      console.log(preferences.youtube.selectedTags, "<<customInterestTags");
 
   const favoriteChannels = [...preferences.youtube.selectedTags];
   const videoStyle = [...preferences.youtube.videoStyle.selectedPredefinedTags];
