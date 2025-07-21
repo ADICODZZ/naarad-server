@@ -1,4 +1,4 @@
-require('dotenv').config({ path: '../.env' });
+
 const {runDailySportsNewsJobForUser} = require('./controllers/newsController');
 const express = require('express');
 const mongoose = require('mongoose');
@@ -7,7 +7,7 @@ const {customUpdate}= require('./controllers/CustomUpdates');
 const authController = require('./controllers/authController');
 const preferencesController = require('./controllers/preferencesController');
 const { scheduleSportsNewsJobs } = require('./controllers/newsController');
-
+require('dotenv').config({ path: '../.env' });
 const UserModel = require('./models/user'); // 👈 import your User model here
 
 const app = express();
@@ -49,7 +49,7 @@ const runActionsForUser = async (userId) => {
 
   if(sports&& sports.subcategory){
     console.log(` valid sports preferences found for user: ${userId}`);
-    await runDailySportsNewsJobForUser(userId);
+    await runDailySportsNewsJobForUser(user);
   }
 
   if(news && news.tags && news.instructionTags){

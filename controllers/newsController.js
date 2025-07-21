@@ -6,199 +6,36 @@ const { generateSearchQueryWithGemini } = require('../services/queryGenerator');
 const {summarizeArticleFromUrl} = require('../services/summarizeArticles');
 const {fetchImageForArticle,getImageFromPage} = require('../services/newsImage');
 const twilio = require('twilio');
-const axios=require('axios');
+const axios = require('axios');
+const nodemailer = require('nodemailer');
+const moment = require('moment-timezone');
+
 const FROM_WHATSAPP = 'whatsapp:+14155238886';
 require('dotenv').config({ path: '../.env' });
-//const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
-require('dotenv').config({ path: '../.env' });
 
-// exports.runDailySportsNewsJob = async () => {
-//   try {
-//     const users = await User.find({ category: 'sports' });
+// Initialize Twilio client
+const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH);
 
-//     for (const user of users) {
-//       const { subcategory, tags, specificInstructions, aiGeneratedAnswers } = user.preferences.sports;
-//       console.log(subcategory, tags, specificInstructions, aiGeneratedAnswers," User Preferences");
-//       let generatedQuery;
-//       try {
-//         // Step 1: Generate a search query using Gemini
-//         generatedQuery = await generateSearchQueryWithGemini({
-//           category: 'sports',
-//           subcategory,
-//           tags,
-//           instructions: specificInstructions,
-//           aiAnswers: aiGeneratedAnswers,
-//         });
-
-//         console.log("Generated Query:", generatedQuery);
-//       } catch (err) {
-//         generatedQuery = `${subcategory} ${tags?.join(' ') || ''} latest highlights`.trim();
-//       }
-
-//       // Step 2: Fetch sports news articles using SerpAPI
-//       const articles = await getSportsNewsFromSerpApi(generatedQuery);
-//       console.log(`Found ${articles.length} articles for user ${user.email}`);
-//       if (!articles?.length) continue;
-
-//       // Step 3: Filter top articles
-//       const topArticles = shortlistTopArticles(articles, sportsPrefs, 10);
-//       console.log(`Shortlisted ${topArticles.length} top articles for user ${user.email}`);
-//       if (!topArticles.length) continue;
-//       // Step 4: Let Gemini pick the best one
-//       const { bestArticle, reason } = await selectBestNewsWithGemini(topArticles, sportsPrefs);
-
-//       // Step 5: Store this article in the user's history
-//       user.newsHistory.push({
-//         title: bestArticle.title,
-//         url: bestArticle.url || '',
-//         date: new Date(),
-//         reason,
-//       });
-
-//       await user.save();
-
-      
-//     }
-
-//     console.log("✅ Sports news sent to all users.");
-//   } catch (error) {
-//     console.error("❌ Error in sports news cron job:", error.message);
-//   }
-// };
-
-// Schedule job: runs every day at 5:00 AM IST
-// cron.schedule('0 5 * * *', () => {
-//   console.log("⏰ Running Sports News Job at 5 AM");
-//   runDailySportsNewsJob();
-// }, {
-//   timezone: "Asia/Kolkata"
-// });
-
-
-exports.runDailySportsNewsJob = async (req,res) => {
-  try {
-    //const users = await User.find({ category: 'sports' });
-
-    //for (const user of users) {
-    const { preferences } = req.body;
-    const userPhoneNumber='+919798537736';
-      const { subcategory, tags, specificInstructions, aiGeneratedAnswers } = req.body.preferences.sports;
-      console.log(subcategory, tags, specificInstructions, aiGeneratedAnswers," User Preferences");
-      let generatedQuery;
-      try {
-
-        // Step 1: Generate a search query using Gemini
-        // generatedQuery = await generateSearchQueryWithGemini({
-        //   category: 'sports',
-        //   subcategory,
-        //   tags,
-        //   instructions: specificInstructions,
-        //   aiAnswers: aiGeneratedAnswers,
-        // });
-
-        //console.log("Generated Query:", generatedQuery);
-      } catch (err) {
-       // generatedQuery = `${subcategory} ${tags?.join(' ') || ''} latest highlights`.trim();
-      }
-
-      // Step 2: Fetch sports news articles using SerpAPI
-      const articles = await getSportsNewsFromSerpApi(subcategory);
-      console.log(`Found ${articles.length} articles for user `);
-      //console.log("Articles:", articles);
-      //if (!articles?.length) continue;
-
-      // Step 3: Filter top articles
-      const topArticles = shortlistTopArticles(articles, subcategory, 10);
-      console.log(`Shortlisted ${topArticles.length} top articles for user `);
-      //if (!topArticles.length) continue;
-      //console.log("Top Articles:", topArticles);
-
-      // Step 4: Let Gemini pick the best one
-      const { bestArticle, reason } = await selectBestNewsWithGemini(topArticles, preferences);
-      console.log("Best Article:", bestArticle, "Reason:", reason);
-
-      //step-5 : summarize the news article
-      const summary = await summarizeArticleFromUrl(bestArticle.url);
-      console.log("Summary:", summary);
-
-      //const images=await fetchImageForArticle(bestArticle.title);
-      const imageUrl = await getImageFromPage(bestArticle.url);
-      console.log("Image:", imageUrl);
-      
-      // Step 5: Store this article in the user's history
-      // user.newsHistory.push({
-      //   title: bestArticle.title,
-      //   url: bestArticle.url || '',
-      //   date: new Date(),
-      //   reason,
-      // });
-
-      // await user.save();
-      const response = await this.sendNewsUpdate(userPhoneNumber, bestArticle.title, summary,bestArticle.url,imageUrl);
-      console.log(response,"Response from Twilio");
-
-      return res.status(200).json({
-        message: "Sports news fetched successfully",
-        bestArticle,
-        reason,
-        summary
-      });
-
-      
-    //}
-
-    console.log("✅ Sports news sent to all users.");
-  } catch (error) {
-    console.error("❌ Error in sports news cron job:", error.message);
-    return res.status(500).json({
-      message: "Error fetching sports news",
-      error: error.message,
-    });
+// Initialize nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS
   }
-};
-
- // Twilio sandbox sender or approved number
-
-
+});
 
 const cronJobs = new Map(); // Store cron jobs by user ID
 
-
-
-// Expose a function to reschedule for a single user
-const rescheduleUserJob = async (userId) => {
-  const user = await User.findById(userId);
-  if (!user || !user.preferredTime) return;
-
-  // Cancel existing job
-  if (cronJobs.has(userId)) {
-    cronJobs.get(userId).destroy();
-    cronJobs.delete(userId);
-  }
-
-  const [hour, minute] = user.preferredTime.split(':').map(Number);
-  const cronExpression = `${minute} ${hour} * * *`;
-
-  const job = cron.schedule(cronExpression, async () => {
-    console.log(`Running sports news job for ${user.phoneNumber} at ${user.preferredTime} ${user.timezone}`);
-    await runDailySportsNewsJobForUser(user);
-  }, {
-    timezone: user.timezone || 'UTC',
-  });
-
-  cronJobs.set(userId, job);
-  console.log(`Rescheduled sports news for ${user.phoneNumber} at ${user.preferredTime} ${user.timezone}`);
-};
-
-
-
-const moment = require('moment-timezone');
-
-exports.runDailySportsNewsJobForUser = async (user) => {
+// Main function you want to import
+async function runDailySportsNewsJobForUser(user) {
+  const userId = user._id;
+  console.log(`🔍 Starting daily sports news job for user: ${userId}`);
+  
   try {
     const { preferences, whatsappNumber } = user;
-    const { subcategory, tags, instructionTags, favPlayers,favTeams, aiGeneratedAnswers } = preferences.sports;
-    console.log(subcategory, tags,favPlayers, instructionTags, aiGeneratedAnswers, `User Preferences for ${whatsappNumber}`);
+    const { subcategory, tags, instructionTags, favPlayers, favTeams, aiGeneratedAnswers } = preferences.sports;
+    console.log(subcategory, tags, favPlayers, instructionTags, aiGeneratedAnswers, `User Preferences for ${whatsappNumber}`);
 
     // Step 1: Fetch sports news articles using SerpAPI
     const articles = await getSportsNewsFromSerpApi(subcategory);
@@ -235,16 +72,83 @@ exports.runDailySportsNewsJobForUser = async (user) => {
     const response = await sendNewsUpdate('9142437079', bestArticle.title, summary, bestArticle.url, imageUrl);
     console.log(response, `Response from Twilio for ${whatsappNumber}`);
 
-    const emailResponse=await sendEmail(user.email, bestArticle.title, summary);
+    const emailResponse = await sendEmail(user.email, bestArticle.title, summary);
     console.log(emailResponse, `Email sent to ${user.email}`);
 
     console.log(`✅ Sports news sent to ${whatsappNumber}.`);
   } catch (error) {
     console.error(`❌ Error in sports news job for ${user.whatsappNumber}:`, error.message);
   }
+}
+
+
+
+// Other functions
+const runDailyNewsJobForUser = async (user) => {
+  try {
+    const { preferences, whatsappNumber } = user;
+    const { tags, newsSources, newsdepth, newsFormatPreference, newsFrequency, instructionTags, aiGeneratedAnswers } = preferences.news;
+    console.log(tags, newsSources, newsdepth, newsFormatPreference, newsFrequency, instructionTags, aiGeneratedAnswers, `User Preferences for ${whatsappNumber}`);
+
+    // Create a search query from news tags and sources
+    const searchQuery = tags?.join(' ') || 'latest news';
+    const articles = await getGeneralNewsFromSerpApi(searchQuery, newsSources);
+    console.log(`Found ${articles.length} articles for user ${whatsappNumber}`);
+    if (!articles?.length) return;
+
+    const topArticles = shortlistTopArticles(articles, searchQuery, 10);
+    console.log(`Shortlisted ${topArticles.length} top articles for user ${whatsappNumber}`);
+    if (!topArticles.length) return;
+
+    const { bestArticle, reason } = await selectBestNewsWithGemini(topArticles, preferences);
+    console.log("Best Article:", bestArticle, "Reason:", reason);
+
+    const summary = await summarizeArticleFromUrl(bestArticle.url);
+    console.log("Summary:", summary);
+
+    const imageUrl = await getImageFromPage(bestArticle.url);
+    console.log("Image:", imageUrl);
+
+    user.newsHistory.push({
+      title: bestArticle.title,
+      url: bestArticle.url || '',
+      date: new Date(),
+      reason,
+    });
+    await user.save();
+
+    const response = await sendNewsUpdate('9142437079', bestArticle.title, summary, bestArticle.url, imageUrl);
+    console.log(response, `Response from Twilio for ${whatsappNumber}`);
+
+    const emailResponse = await sendGeneralNewsEmail(user.email, bestArticle.title, summary);
+    console.log(emailResponse, `Email sent to ${user.email}`);
+
+    console.log(`✅ General news sent to ${whatsappNumber}.`);
+  } catch (error) {
+    console.error(`❌ Error in general news job for ${user.whatsappNumber}:`, error.message);
+  }
 };
 
-async function sendEmail( to_email, subject, message ) {
+
+async function sendEmail(to_email, subject, message) {
+  const mailOptions = {
+    from: `"Update Bot" <${process.env.GMAIL_USER}>`,
+    to: to_email,
+    subject,
+    text: message,
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent!", info.response);
+    return { success: true, info };
+  } catch (error) {
+    console.error("❌ Failed to send email:", error);
+    return { success: false, error };
+  }
+}
+
+async function sendAllNewsEmail(to_email, subject, message) {
   const mailOptions = {
     from: `"Update Bot" <${process.env.GMAIL_USER}>`,
     to: to_email,
@@ -263,82 +167,32 @@ async function sendEmail( to_email, subject, message ) {
 }
 
 
-// Schedule jobs for all users
-const scheduleSportsNewsJobs = async () => {
+
+const sendNewsUpdate = async (userPhoneNumber, newsTitle, newsContent, url, imageUrl) => {
   try {
-    const users = await User.find({ category: 'sports' });
-    console.log(`Found ${users.length} users for sports news scheduling.`);
-    console.log("Users:", users);
-
-    for (const user of users) {
-      const { preferredTime, timezone } = user.frequencyTiming;
-      console.log(`User ${user.phoneNumber} has preferred time ${preferredTime} and timezone ${timezone}.`);
-      if (!preferredTime) {
-        //console.log(`Skipping user ${user.phoneNumber}: No preferred time set.`);
-        continue;
-      }
-
-      // Parse preferred time (e.g., "08:00" -> { hour: 8, minute: 0 })
-// Parse preferredTime (handle both HH:mm and 12-hour formats like "12:00 AM")
-      let parsedTime = moment(preferredTime, ['HH:mm', 'h:mm A', 'h:mm a'], true);
-      if (!parsedTime.isValid()) {
-        console.log(`Skipping user: Invalid preferredTime format (${preferredTime})`);
-        continue;
-      }
-
-      // Convert to 24-hour format
-      const hour = parsedTime.format('HH');
-      const minute = parsedTime.format('mm');
-      console.log(`Parsed preferred time for user : ${hour}:${minute}`);
-
-      // Create cron expression
-      const cronExpression = `${minute} ${hour} * * *`;
-      console.log(`Cron expression for : ${cronExpression}`); // e.g., "0 8 * * *" for 8:00 AM
-      cron.schedule(cronExpression, async () => {
-      console.log(`Running sports news job for  at ${preferredTime} ${timezone}`);
-        await runDailySportsNewsJobForUser(user);
-      }, {
-        timezone: timezone || 'IST', // Use user's timezone or default to UTC
-      });
-
-      console.log(`Scheduled sports news for ${user.phoneNumber} at ${preferredTime} ${timezone}`);
-    }
-
-    console.log('✅ All sports news jobs scheduled.');
-  } catch (error) {
-    console.error('❌ Error scheduling sports news jobs:', error.message);
-  }
-};
-
-const sendNewsUpdate = async (userPhoneNumber, newsTitle, newsContent,url,imageUrl) => {
-  try {
-    //const { userPhoneNumber, newsTitle, newsContent } = req.body;
-
     if (!userPhoneNumber || !newsTitle || !newsContent) {
-      return res.status(400).json({ message: 'Missing required fields.' });
+      throw new Error('Missing required fields.');
     }
 
-    //shortening article uri
+    // Shortening article URL
     const response = await axios.get(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
-    console.log(response.data,"response.data");
-    const newUrl=response.data;
+    console.log(response.data, "response.data");
+    const newUrl = response.data;
 
-    
     // Format message
-    const emoji = '📰'; // use 🏏 for cricket, ⚽ for football, etc., dynamically if you like
+    const emoji = '📰';
     const messageBody = `${emoji} *${newsTitle}*\n\n${newsContent} \n\nRead full article here:${newUrl}`;
-    console.log(messageBody,"Message Body");
+    console.log(messageBody, "Message Body");
 
     // Send WhatsApp message
     const message = await client.messages.create({
       from: FROM_WHATSAPP,
-      to: `whatsapp:${"+91"+userPhoneNumber}`, // Must be opted in (e.g., +91XXXXXXXXXX)
+      to: `whatsapp:${"+91" + userPhoneNumber}`,
       body: messageBody,
-      mediaUrl:imageUrl||null
+      mediaUrl: imageUrl || null
     });
 
     console.log('✅ WhatsApp message sent:', message.sid);
-
     return message;
   } catch (error) {
     console.error('❌ Error sending WhatsApp message:', error.message);
@@ -346,5 +200,11 @@ const sendNewsUpdate = async (userPhoneNumber, newsTitle, newsContent,url,imageU
   }
 };
 
-module.exports = { scheduleSportsNewsJobs };
-
+// EXPORT ALL FUNCTIONS AT THE END - THIS IS THE FIX
+module.exports = {
+  runDailySportsNewsJobForUser,
+  runDailyNewsJobForUser,
+  sendNewsUpdate,
+  sendEmail,
+  sendAllNewsEmail
+};
