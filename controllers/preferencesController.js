@@ -217,10 +217,10 @@ exports.updatePreferences = async (req, res) => {
     if (preferences.youtube.selectedTags.length != 0) {
       console.log(preferences.youtube.selectedTags, "<<customInterestTags");
 
-        const favoriteChannels = [...preferences.youtube.selectedTags];
-        const videoStyle = [...preferences.youtube.videoStyle.selectedPredefinedTags];
-        const specificInstructions = preferences.customInterestTags?.[1] || ''; // assume string
-        const duration = [...preferences.youtube.instructionTags];
+        const favoriteChannels = [...preferences?.youtube?.selectedTags];
+        const videoStyle = [...preferences?.youtube?.videoStyle?.selectedPredefinedTags];
+        const specificInstructions = preferences?.customInterestTags?.[1] || ''; // assume string
+        const duration = [...preferences?.youtube?.instructionTags];
 
   const userId = req.params.userId;
   const user = await User.findById(userId);
@@ -240,7 +240,7 @@ exports.updatePreferences = async (req, res) => {
 
   await user.save();
 
-  return res.status(200).json({ message: 'Preferences updated successfully', user });
+  return res.status(200).json({ message: 'Preferences youtube updated successfully', user });
 }
 
 
