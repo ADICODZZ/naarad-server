@@ -217,26 +217,34 @@ exports.updatePreferences = async (req, res) => {
     if (preferences.youtube.selectedTags.length != 0) {
       console.log(preferences.youtube.selectedTags, "<<customInterestTags");
 
-        const favoriteChannels = [...preferences?.youtube?.selectedTags];
-        const videoStyle = [...preferences?.youtube?.videoStyle?.selectedPredefinedTags];
-        const specificInstructions = preferences?.customInterestTags?.[1] || ''; // assume string
-        const duration = [...preferences?.youtube?.instructionTags];
+      const favoriteChannels = [...preferences?.youtube?.selectedTags];
+      const videoStyle = [...preferences?.youtube?.videoStyle?.selectedPredefinedTags];
+      //const specificInstructions = preferences?.customInterestTags?.[1] || ''; // assume string
+      const duration = [...preferences?.youtube?.instructionTags];
 
-  const userId = req.params.userId;
-  const user = await User.findById(userId);
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
-  }
+      console.log("1st stage done")
 
-  if (!user.preferences.youtube) {
-    user.preferences.youtube = {};
-  }
+      const userId = req.params.userId;
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      if (!user.preferences.youtube) {
+          user.preferences.youtube = {};
+      }
 
-  user.preferences.youtube.favoriteChannels = favoriteChannels;
-  user.preferences.youtube.videoStyle = videoStyle;
-  user.preferences.youtube.specificInstructions = specificInstructions;
-  user.preferences.youtube.duration = duration;
-  user.preferences.youtube.lastUpdate = Date.now();
+      console.log("2nd stage done")
+
+     user.preferences.youtube.favoriteChannels = favoriteChannels;
+     console.log("3rd stage done")
+     user.preferences.youtube.videoStyle = videoStyle;
+      console.log("4th stage done")
+     //user.preferences.youtube.specificInstructions = specificInstructions;
+     user.preferences.youtube.duration = duration;
+      user.preferences.youtube.topicsOfInterest = preferences.youtube.topicsOfInterest || [];
+        console.log("5th stage done")
+     user.preferences.youtube.lastUpdate = Date.now();
+      console.log("6th stage done")
 
   await user.save();
 
