@@ -219,7 +219,7 @@ exports.updatePreferences = async (req, res) => {
 
       const favoriteChannels = [...preferences?.youtube?.selectedTags];
       console.log(favoriteChannels, "favoriteChannels");
-      // const videoStyle = [...preferences?.youtube?.videoStyle?.selectedPredefinedTags];
+      const videoStyle = [...preferences?.youtube?.followUpAnswers?.videoStyle?.selectedPredefinedTags];
       // console.log(videoStyle, "videoStyle");
       //const specificInstructions = preferences?.customInterestTags?.[1] || ''; // assume string
       const duration = [...preferences?.youtube?.instructionTags];
@@ -240,11 +240,11 @@ exports.updatePreferences = async (req, res) => {
 
      user.preferences.youtube.favoriteChannels = favoriteChannels;
      console.log("3rd stage done")
-     user.preferences.youtube.videoStyle = videoStyle;
-      console.log("4th stage done")
+    //  user.preferences.youtube.videoStyle = videoStyle;
+    //   console.log("4th stage done")
      //user.preferences.youtube.specificInstructions = specificInstructions;
      user.preferences.youtube.duration = duration;
-      user.preferences.youtube.topicsOfInterest = preferences.youtube.topicsOfInterest || [];
+      //user.preferences.youtube.topicsOfInterest = preferences.youtube.topicsOfInterest || [];
         console.log("5th stage done")
      user.preferences.youtube.lastUpdate = Date.now();
       console.log("6th stage done")
