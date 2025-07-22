@@ -45,6 +45,7 @@ async function runDailySportsNewsJobForUser(user) {
     // Step 2: Filter top articles
     const topArticles = shortlistTopArticles(articles, subcategory, 10);
     console.log(`Shortlisted ${topArticles.length} top articles for user ${whatsappNumber}`);
+    console.log(topArticles, "Top Articles");
     if (!topArticles.length) return;
 
     // Step 3: Let Gemini pick the best one

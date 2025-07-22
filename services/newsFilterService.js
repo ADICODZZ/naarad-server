@@ -110,7 +110,7 @@ ${preferences.sports.aiGeneratedAnswers?.map((ans, i) => `   ${i + 1}. ${ans}`).
 
 📚 ARTICLES TO CHOOSE FROM:
 
-${topArticles.map((article, index) => `   ${index + 1}. ${article.title} (${article.url})`).join('\n')}
+${topArticles.map((article, index) => `   ${index}. ${article.title} (${article.url})`).join('\n')}
 
 ---
 

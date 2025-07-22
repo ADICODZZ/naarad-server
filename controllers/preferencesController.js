@@ -172,7 +172,7 @@ exports.updatePreferences = async (req, res) => {
         return res.status(404).json({ message: 'User not found' });
       }
 
-      user.category.push("news");
+      user?.category?.push("news");
       user.alertPaused=preferences.alertPaused;
 
       user.preferences.news ={
