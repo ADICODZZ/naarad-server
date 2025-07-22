@@ -218,9 +218,12 @@ exports.updatePreferences = async (req, res) => {
       console.log(preferences.youtube.selectedTags, "<<customInterestTags");
 
       const favoriteChannels = [...preferences?.youtube?.selectedTags];
+      console.log(favoriteChannels, "favoriteChannels");
       const videoStyle = [...preferences?.youtube?.videoStyle?.selectedPredefinedTags];
+      console.log(videoStyle, "videoStyle");
       //const specificInstructions = preferences?.customInterestTags?.[1] || ''; // assume string
       const duration = [...preferences?.youtube?.instructionTags];
+      console.log(duration, "duration");
 
       console.log("1st stage done")
 

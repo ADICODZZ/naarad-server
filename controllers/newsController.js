@@ -70,8 +70,8 @@ async function runDailySportsNewsJobForUser(user) {
     await user.save();
 
     // Step 7: Send news update via Twilio
-    const response = await sendNewsUpdate('9142437079', bestArticle.title, summary, bestArticle.url, imageUrl);
-    console.log(response, `Response from Twilio for ${whatsappNumber}`);
+    // const response = await sendNewsUpdate('9142437079', bestArticle.title, summary, bestArticle.url, imageUrl);
+    // console.log(response, `Response from Twilio for ${whatsappNumber}`);
 
     const emailResponse = await sendEmail(user.email, bestArticle.title, summary);
     console.log(emailResponse, `Email sent to ${user.email}`);
