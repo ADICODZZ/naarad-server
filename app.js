@@ -1,5 +1,6 @@
-
+const {YoutubeUpdate} = require('./controllers/YouTubeUpdate');
 const {runDailySportsNewsJobForUser} = require('./controllers/newsController');
+const {runDailyNewsJobForUser}= require('./controllers/newsController');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -37,10 +38,13 @@ const runActionsForUser = async (userId) => {
     return;
   }
 
+
+
   // Check if custom preferences exist and have a type or instructions
   const custom = user.preferences?.custom;
   const sports= user.preferences?.sports;
   const news = user.preferences?.news;
+  console.log(news, "news preferences");
 
   if (custom && (custom.category )) {
     console.log(` valid custom preferences found for user: ${userId}`);
@@ -49,12 +53,18 @@ const runActionsForUser = async (userId) => {
 
   if(sports&& sports.subcategory){
     console.log(` valid sports preferences found for user: ${userId}`);
-    await runDailySportsNewsJobForUser(user);
+    //await runDailySportsNewsJobForUser(user);
   }
 
   if(news && news.tags && news.instructionTags){
     console.log(`valid news preferences found for user: ${userId}`);
-    //await runDailySportsNewsJobForUser(userId);
+    await runDailyNewsJobForUser(user);
+  }
+
+  if(user.preferences?.youtube) {
+    console.log(`🔍 Starting YouTube update for user: ${userId}`);
+    const youtubeResponse = await YoutubeUpdate(user);
+    console.log(`✅ YouTube update response for user ${userId}:`, youtubeResponse);
   }
 
 
@@ -78,11 +88,13 @@ const checkUsersPreferredTime = async () => {
       console.log(`✅ User ${user._id} has preferred time ${currentTime}. Running actions...`);
     }
     else{
-      runActionsForUser(user._id);
+      //runActionsForUser(user._id);
       console.log(`❌ User ${user._id} does not have preferred time ${currentTime}. Skipping...`);
     }
   });
 };
+
+
 
 const startBackgroundJob = async () => {
   while (true) {

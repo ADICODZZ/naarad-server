@@ -37,3 +37,4 @@ exports.getSportsNewsFromSerpApi = (subcategory) => {
     });
   });
 };
+

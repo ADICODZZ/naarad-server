@@ -11,6 +11,7 @@ exports.updatePreferences = async (req, res) => {
     if (!preferences || !preferences.frequency) {
       return res.status(400).json({ message: 'category and frequencyTiming are required inside preferences' });
     }
+    
 
     if(preferences.sports.selectedTags.length!=0){
       const selectedsport = preferences.sports.selectedTags[0];
@@ -183,8 +184,7 @@ exports.updatePreferences = async (req, res) => {
         instructionTags
         
       }
-      user.frequencyTiming.frequency=preferences.frequency;
-      user.frequencyTiming.preferredTime=preferredTime;
+     
       user.customInterestTags=preferences.customInterestTags;
       //user.frequencyTiming.deliveryPlatform=preferences.deliveryPlatform;
 
@@ -251,19 +251,27 @@ exports.updatePreferences = async (req, res) => {
 
   await user.save();
 
-  return res.status(200).json({ message: 'Preferences youtube updated successfully', user });
+  //return res.status(200).json({ message: 'Preferences youtube updated successfully', user });
 }
-
-
-
+ if(preferences.frequency=="Morning Digest"){
+        preferredTime="09:00";
+      }else if(preferences.frequency=="Evening Summary"){
+        preferredTime="18:00";
+      }else if(preferences.frequency=="Custom"){
+        preferredTime=preferences.customFrequencyTime||'16:00';
+      }else{
+        prefferedTime="09:00";
+      }
 
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
-   
 
+    user.frequencyTiming.frequency=preferences.frequency;
+    user.frequencyTiming.preferredTime=preferredTime;
+    user.save();
+    console.log(`Preferences updated for user ${userId}:`, preferences);
     res.status(200).json({
       message: 'Preferences updated successfully',
       user,

@@ -178,11 +178,130 @@ function filterPreviousDayNews(articles) {
   });
 }
 
+async function selectBestAllNewsWithGemini(topArticles, preferences) {
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 
+  const prompt = `
+You are a smart assistant that helps select one **most relevant** news article from a list, based on user preferences. Your task is to behave like a **logical human assistant**, using reasoning, contextual understanding, and soft signal matching — not rigid keyword matching.
+
+---
+
+🎯 YOUR OBJECTIVE:
+From a list of news articles, choose the **one** that best matches what the user is **really interested in**, even if the match is not directly based on keywords. Your response must reflect intelligent judgment, nuanced relevance, and an understanding of **how real users interpret related content**.
+
+---
+
+🧠 THINKING STRATEGY:
+
+1. **Understand Preference Depth**:
+   - Parse the user's preferences not as strict filters but as **core intent signals**.
+   - For example, if a user likes "Technology," they may be interested in:
+     - AI developments,
+     - Startup news,
+     - Product launches,
+     - Tech industry analysis, or
+     - Innovation stories.
+
+2. **Semantically Expand Tags**:
+   - Don't just look for exact tags in the article.
+   - Consider their **conceptual and contextual equivalents**:
+     - "Politics" ≈ "Government policy," "Elections," "Political analysis"
+     - "Business" ≈ "Economy," "Market trends," "Corporate news"
+     - "Health" ≈ "Medical research," "Public health," "Healthcare policy"
+
+3. **Latent Interest Mapping**:
+   - Try to imagine: *"What would a human with these preferences care about?"*
+   - Even if an article doesn't mention exact tags, if it includes **related themes or impacts**, that can be **more relevant** than an exact-match but superficial article.
+
+4. **Content Quality and Format Sensitivity**:
+   - Consider the user's preferred news format and depth.
+   - If user prefers "detailed analysis," choose in-depth articles over brief updates.
+   - If user wants "quick updates," prioritize concise but informative pieces.
+
+5. **Temporal Relevance**:
+   - Give **priority** to articles from the **previous day** or most recent — breaking news and current events.
+   - Balance freshness with relevance: a slightly older but highly relevant article is better than fresh but unrelated news.
+
+6. **Avoid Negative/Disturbing Content**:
+   - Don't include articles with keywords like "Died," "Death," "Accident," "Tragedy," "Violence" etc.
+   - Avoid overly negative or disturbing content unless specifically requested.
+   - Ask: *"Does this article provide valuable information without being unnecessarily distressing?"*
+   - Choose **constructive and informative content**.
+
+7. **News Source Credibility**:
+   - Consider the reliability and reputation of news sources.
+   - Prefer established, credible news outlets over questionable sources.
+
+---
+
+📌 USER PREFERENCES:
+
+- News Tags/Interests: ${preferences.news.tags?.join(', ') || 'General news'}
+- Preferred News Sources: ${preferences.news.newsSources?.join(', ') || 'Any reliable source'}
+- News Depth Preference: ${preferences.news.newsdepth || 'Medium depth'}
+- News Format Preference: ${preferences.news.newsFormatPreference || 'Standard article'}
+- News Frequency: ${preferences.news.newsFrequency || 'Daily'}
+- Instruction Tags: ${preferences.news.instructionTags?.join(', ') || 'None'}
+- AI-Generated Preferences:
+
+
+---
+
+📚 ARTICLES TO CHOOSE FROM:
+
+${topArticles.map((article, index) => `   ${index}. ${article.title} (${article.url})`).join('\n')}
+
+---
+
+📤 FINAL TASK:
+
+Choose the **ONE** article from above that you think would most likely **capture the user's interest** based on their general news preferences.
+
+Return ONLY this JSON output format:
+\`\`\`json
+{
+  "index": <index of best article>,
+  "reason": "<why this article matches the user's interests — not just textually, but conceptually>"
+}
+\`\`\`
+
+❗ Very Important:
+- DO NOT include any text outside of the JSON.
+- The reason must show **human-like justification** (e.g., "Although not directly about technology, this article discusses AI regulation which aligns with the user's interest in tech policy and innovation").
+- Consider news depth preference, format preference, and overall user interests.
+
+---
+`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    console.log('Gemini response:', result);
+    const text = result.response.text();
+    console.log('Gemini response text:', text);
+    const cleaned = text
+      .replace(/^```json\s*/, '')  // remove leading ```json
+      .replace(/```$/, '')         // remove trailing ```
+      .trim();
+    console.log('Gemini response cleaned:', cleaned);
+    const json = JSON.parse(cleaned);
+    console.log('Gemini response JSON:', json);
+    return {
+      bestArticle: topArticles[json.index],
+      reason: json.reason,
+    };
+  } catch (err) {
+    console.error('Gemini selection failed:', err.message);
+    return {
+      bestArticle: topArticles[0],
+      reason: 'Fallback to highest scored article due to Gemini error.'
+    };
+  }
+}
 
 module.exports = {
   computeRelevanceScore,
   shortlistTopArticles,
   filterPreviousDayNews,
+  selectBestAllNewsWithGemini,
   selectBestNewsWithGemini,
 };

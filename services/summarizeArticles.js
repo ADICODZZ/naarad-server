@@ -115,4 +115,8 @@ const testUrl =
 
 //summarizeArticleFromUrl(testUrl);
 
-module.exports = {summarizeArticleFromUrl};
+module.exports = {summarizeArticleFromUrl,
+  fetchArticleContent, 
+  extractWithReadability, 
+  summarizeContent
+};

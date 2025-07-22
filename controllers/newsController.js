@@ -1,9 +1,10 @@
 const cron = require('node-cron');
 const User = require('../models/user');
 const { getSportsNewsFromSerpApi } = require('../services/sportsService');
-const {shortlistTopArticles, selectBestNewsWithGemini} = require('../services/newsFilterService');
+const {shortlistTopArticles, selectBestNewsWithGemini,selectBestAllNewsWithGemini} = require('../services/newsFilterService');
 const { generateSearchQueryWithGemini } = require('../services/queryGenerator');
-const {summarizeArticleFromUrl} = require('../services/summarizeArticles');
+
+const {summarizeArticleFromUrl,extractWithReadability} = require('../services/summarizeArticles');
 const {fetchImageForArticle,getImageFromPage} = require('../services/newsImage');
 const twilio = require('twilio');
 const axios = require('axios');
@@ -60,6 +61,9 @@ async function runDailySportsNewsJobForUser(user) {
     const imageUrl = await getImageFromPage(bestArticle.url);
     console.log("Image:", imageUrl);
 
+    const shortenedUrl=await shortenUrl(bestArticle.url);
+    console.log("Shortened URL:", shortenedUrl);
+
     // Step 6: Store this article in the user's history
     user.newsHistory.push({
       title: bestArticle.title,
@@ -85,43 +89,57 @@ async function runDailySportsNewsJobForUser(user) {
 
 
 // Other functions
+const { getNewsFromNewsAPI,shortenUrl } = require('../services/newsApiServices'); 
+
 const runDailyNewsJobForUser = async (user) => {
   try {
     const { preferences, whatsappNumber } = user;
     const { tags, newsSources, newsdepth, newsFormatPreference, newsFrequency, instructionTags, aiGeneratedAnswers } = preferences.news;
     console.log(tags, newsSources, newsdepth, newsFormatPreference, newsFrequency, instructionTags, aiGeneratedAnswers, `User Preferences for ${whatsappNumber}`);
 
-    // Create a search query from news tags and sources
-    const searchQuery = tags?.join(' ') || 'latest news';
-    const articles = await getGeneralNewsFromSerpApi(searchQuery, newsSources);
+    // Get articles from NewsAPI instead of SerpApi
+    const articles = await getNewsFromNewsAPI(preferences);
     console.log(`Found ${articles.length} articles for user ${whatsappNumber}`);
-    if (!articles?.length) return;
+    console.log(articles, "Articles");
+    
+    if (!articles?.length) {
+      console.log(`No articles found for user ${whatsappNumber}`);
+      return;
+    }
 
-    const topArticles = shortlistTopArticles(articles, searchQuery, 10);
-    console.log(`Shortlisted ${topArticles.length} top articles for user ${whatsappNumber}`);
-    if (!topArticles.length) return;
+    // You can still use your existing shortlist function if needed
+    // const topArticles = articles.length > 10 
+    //   ? shortlistRecentArticles(articles, tags?.join(' ') || 'news', 10)
+    //   : articles;
+    
+    // console.log(`Shortlisted ${topArticles.length} top articles for user ${whatsappNumber}`);
+    // if (!topArticles.length) return;
 
-    const { bestArticle, reason } = await selectBestNewsWithGemini(topArticles, preferences);
+    const { bestArticle, reason } = await selectBestAllNewsWithGemini(articles, preferences);
     console.log("Best Article:", bestArticle, "Reason:", reason);
 
     const summary = await summarizeArticleFromUrl(bestArticle.url);
     console.log("Summary:", summary);
 
-    const imageUrl = await getImageFromPage(bestArticle.url);
+    const imageUrl = await getImageFromPage(bestArticle.url) || bestArticle.urlToImage;
     console.log("Image:", imageUrl);
+
+    const shortenedUrl=await shortenUrl(bestArticle.url);
+    console.log("Shortened URL:", shortenedUrl);
 
     user.newsHistory.push({
       title: bestArticle.title,
       url: bestArticle.url || '',
       date: new Date(),
       reason,
+      source: bestArticle.source, // Include source from NewsAPI
     });
     await user.save();
 
-    const response = await sendNewsUpdate('9142437079', bestArticle.title, summary, bestArticle.url, imageUrl);
-    console.log(response, `Response from Twilio for ${whatsappNumber}`);
+    // const response = await sendNewsUpdate('9142437079', bestArticle.title, summary, bestArticle.url, imageUrl);
+    // console.log(response, `Response from Twilio for ${whatsappNumber}`);
 
-    const emailResponse = await sendGeneralNewsEmail(user.email, bestArticle.title, summary);
+    const emailResponse = await sendEmail(user.email, bestArticle.title, summary);
     console.log(emailResponse, `Email sent to ${user.email}`);
 
     console.log(`✅ General news sent to ${whatsappNumber}.`);
@@ -129,7 +147,6 @@ const runDailyNewsJobForUser = async (user) => {
     console.error(`❌ Error in general news job for ${user.whatsappNumber}:`, error.message);
   }
 };
-
 
 async function sendEmail(to_email, subject, message) {
   const mailOptions = {

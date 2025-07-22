@@ -1,4 +1,4 @@
-import { checkNewVideos } from "../services/VideoUploaded";
+//import { checkNewVideos } from "../services/VideoUploaded";
 
 
 async function YoutubeUpdate(user) {
@@ -45,3 +45,5 @@ async function YoutubeUpdate(user) {
         return { error: error.message };
     }
 }
+
+module.exports = {YoutubeUpdate};
