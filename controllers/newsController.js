@@ -73,11 +73,28 @@ async function runDailySportsNewsJobForUser(user) {
     });
     await user.save();
 
+     const parameters=[imageUrl, bestArticle.title, summary, shortenedUrl];
+     const whatsappNo='9175419148'
+
+    const whatsappMessage= await sendWatiTemplateMessages(
+      process.env.WATI_ACCESS_TOKEN,
+      process.env.WATI_TENANT_ID,
+    'news_template_1',
+      `+91${whatsappNo}`,
+      parameters,
+      broadcastName = `news_template_1_${Date.now()}`
+
+    )
+
+
+    console.log(whatsappMessage, `WhatsApp message sent to ${user.whatsappNumber}`);
+
+
     // Step 7: Send news update via Twilio
     // const response = await sendNewsUpdate('9142437079', bestArticle.title, summary, bestArticle.url, imageUrl);
     // console.log(response, `Response from Twilio for ${whatsappNumber}`);
 
-    const emailResponse = await sendEmail(user.email, bestArticle.title, summary);
+    //const emailResponse = await sendEmail(user.email, bestArticle.title, summary);
     console.log(emailResponse, `Email sent to ${user.email}`);
 
     console.log(`✅ Sports news sent to ${whatsappNumber}.`);
@@ -136,6 +153,7 @@ const runDailyNewsJobForUser = async (user) => {
     });
     await user.save();
 
+   
     // const response = await sendNewsUpdate('9142437079', bestArticle.title, summary, bestArticle.url, imageUrl);
     // console.log(response, `Response from Twilio for ${whatsappNumber}`);
 
@@ -183,6 +201,62 @@ async function sendAllNewsEmail(to_email, subject, message) {
     return { success: false, error };
   }
 }
+
+
+
+
+
+async function sendWatiTemplateMessages(
+  accessToken,
+  tenantId,
+  templateName,
+  whatsappNumber,
+  params,
+  broadcastName = `broadcast_${Date.now()}`
+) {
+  const url = `https://live-mt-server.wati.io/${tenantId}/api/v1/sendTemplateMessages`;
+
+  const receivers = [
+    {
+      whatsappNumber,
+      customParams: params.map((value, index) => ({
+        name: `${index + 1}`,
+        value
+      }))
+    }
+  ];
+
+  const payload = {
+    template_name: templateName,
+    broadcast_name: broadcastName,
+    receivers,
+    channel_number: "" // optional
+  };
+
+  const headers = {
+    'Authorization': accessToken,
+    'Content-Type': 'application/json'
+  };
+
+  try {
+    const response = await axios.post(url, payload, { headers });
+    console.log(`✅ Sent to ${whatsappNumber}:`, response.data);
+    return response.data;
+  } catch (err) {
+    if (err.response) {
+      console.error(`❌ API error:`, err.response.status, err.response.data);
+    } else {
+      console.error(`❌ Request failed:`, err.message);
+    }
+    throw err;
+  }
+}
+
+// Example usage:
+
+
+// Example usage:
+
 
 
 

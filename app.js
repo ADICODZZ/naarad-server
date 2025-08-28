@@ -48,21 +48,21 @@ const runActionsForUser = async (userId) => {
 
   if (custom && (custom.category )) {
     console.log(` valid custom preferences found for user: ${userId}`);
-    await customUpdate(user);
+    //await customUpdate(user);
   }
 
   if(sports&& sports.subcategory){
     console.log(` valid sports preferences found for user: ${userId}`);
-    //await runDailySportsNewsJobForUser(user);
+    await runDailySportsNewsJobForUser(user);
   }
 
   if(news && news.tags && news.instructionTags){
     console.log(`valid news preferences found for user: ${userId}`);
-    await runDailyNewsJobForUser(user);
+    //await runDailyNewsJobForUser(user);
   }
 
   if(user.preferences?.youtube) {
-    console.log(`🔍 Starting YouTube update for user: ${userId}`);
+   console.log(`🔍 Starting YouTube update for user: ${userId}`);
     const youtubeResponse = await YoutubeUpdate(user);
     console.log(`✅ YouTube update response for user ${userId}:`, youtubeResponse);
   }
@@ -83,7 +83,7 @@ const checkUsersPreferredTime = async () => {
   console.log(`🕒 Checking users at time: ${currentTime}`);
 
   users.forEach((user) => {
-    if (user.preferredTime === currentTime) {
+    if (user.preferredTime !== currentTime) {
       runActionsForUser(user._id);
       console.log(`✅ User ${user._id} has preferred time ${currentTime}. Running actions...`);
     }
